@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>maers | портфолио</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0d0b1a 0%, #1a1535 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, 'Roboto', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        #symbol-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .glass-card {
+            position: relative;
+            z-index: 10;
+            background: rgba(25, 20, 45, 0.65);
+            backdrop-filter: blur(12px);
+            border-radius: 3rem;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 580px;
+            text-align: center;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(156, 108, 230, 0.2);
+            border: 1px solid rgba(160, 120, 255, 0.4);
+            transition: transform 0.2s ease;
+        }
+
+        .glass-card:hover {
+            transform: scale(1.01);
+        }
+
+        .glow-title {
+            font-size: 4.8rem;
+            font-weight: 800;
+            letter-spacing: 6px;
+            background: linear-gradient(135deg, #e2d9ff, #b77eff, #a45ee5);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 12px rgba(164, 94, 229, 0.5);
+            margin-bottom: 2rem;
+            word-break: keep-all;
+        }
+
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 14px 20px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 60px;
+            background: rgba(30, 22, 55, 0.9);
+            backdrop-filter: blur(4px);
+            color: #f0eaff;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(180, 130, 255, 0.5);
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px) scale(1.02);
+            background: #6d3bc9;
+            color: white;
+            box-shadow: 0 12px 24px rgba(109, 59, 201, 0.5);
+            border-color: #c08eff;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+            transition: 0.05s;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 5, 20, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #1e1736;
+            border-radius: 2rem;
+            max-width: 460px;
+            width: 100%;
+            padding: 2rem 1.8rem;
+            text-align: center;
+            border: 1px solid #aa7eff;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.6);
+            animation: fadeSlideUp 0.3s ease;
+        }
+
+        .modal-content p {
+            font-size: 1.2rem;
+            line-height: 1.65;
+            color: #e5d9ff;
+            margin: 1rem 0 1.5rem;
+            text-align: center;
+        }
+
+        .close-modal {
+            background: #8a5cf0;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .close-modal:hover {
+            background: #b77eff;
+            transform: scale(1.02);
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 550px) {
+            .glow-title {
+                font-size: 3rem;
+                letter-spacing: 3px;
+            }
+            .btn {
+                font-size: 1.1rem;
+                padding: 12px 16px;
+            }
+            .glass-card {
+                padding: 1.8rem 1.2rem;
+            }
+            .modal-content p {
+                font-size: 1rem;
+            }
+        }
+
+        footer {
+            margin-top: 2rem;
+            font-size: 0.7rem;
+            opacity: 0.6;
+            color: #bba9ff;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="symbol-canvas"></canvas>
+
+    <div class="glass-card">
+        <h1 class="glow-title">maers</h1>
+        <div class="buttons">
+            <button class="btn" id="tgBtn">Мой Telegram</button>
+            <button class="btn" id="aboutBtn">О себе</button>
+        </div>
+        <footer>✦ код & дизайн maers ✦</footer>
+    </div>
+
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <h2 style="color:#c7abff;">maers</h2>
+            <p>
+                Мне 17 лет. Мой никнейм maers был придуман в 2021 году. 
+                Занимаюсь кодингом на уровне хобби, также рисую. 
+                Учусь в 10 классе, проживаю в России.
+            </p>
+            <button class="close-modal">Закрыть</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const canvas = document.getElementById('symbol-canvas');
+            let ctx = canvas.getContext('2d');
+            let width, height;
+            let symbolsArray = [];
+            
+            const symbolSet = [
+                '数', '码', '零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
+                '爻', '卦', '令', '魂', '符', '咒', '梦', '零', '暗', '紫', '⚡', '✦', '✧',
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '⏣', '⌬', '◈', '◉'
+            ];
+            
+            function randomSymbol() {
+                return symbolSet[Math.floor(Math.random() * symbolSet.length)];
+            }
+            
+            function initCanvas() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                
+                const columns = Math.floor(width / 28);
+                symbolsArray = [];
+                for (let i = 0; i < columns * 2; i++) {
+                    symbolsArray.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height - height,
+                        speed: 1 + Math.random() * 3.5,
+                        symbol: randomSymbol(),
+                        size: 14 + Math.random() * 12,
+                        opacity: 0.3 + Math.random() * 0.5
+                    });
+                }
+            }
+            
+            function drawRain() {
+                if (!ctx) return;
+                ctx.clearRect(0, 0, width, height);
+                ctx.shadowBlur = 0;
+                for (let s of symbolsArray) {
+                    ctx.font = `${s.size}px "Segoe UI", "Noto Sans CJK SC", monospace`;
+                    ctx.fillStyle = `rgba(160, 110, 255, ${s.opacity * 0.7})`;
+                    ctx.fillText(s.symbol, s.x, s.y);
+                    
+                    s.y += s.speed;
+                    if (s.y > height + 50) {
+                        s.y = -30;
+                        s.x = Math.random() * width;
+                        s.symbol = randomSymbol();
+                        s.opacity = 0.3 + Math.random() * 0.6;
+                    }
+                    s.x += (Math.random() - 0.5) * 0.3;
+                    if (s.x < -20) s.x = width + 10;
+                    if (s.x > width + 20) s.x = -20;
+                }
+                requestAnimationFrame(drawRain);
+            }
+            
+            function resizeCanvas() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                const columns = Math.floor(width / 28);
+                symbolsArray = [];
+                for (let i = 0; i < columns * 2; i++) {
+                    symbolsArray.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        speed: 1 + Math.random() * 3.5,
+                        symbol: randomSymbol(),
+                        size: 14 + Math.random() * 12,
+                        opacity: 0.3 + Math.random() * 0.5
+                    });
+                }
+            }
+            
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+            });
+            
+            initCanvas();
+            drawRain();
+            
+            const tgBtn = document.getElementById('tgBtn');
+            tgBtn.addEventListener('click', () => {
+                window.open('https://t.me/googlefreak', '_blank');
+            });
+            
+            const aboutBtn = document.getElementById('aboutBtn');
+            const modal = document.getElementById('aboutModal');
+            const closeModalBtn = document.querySelector('.close-modal');
+            
+            function openModal() {
+                modal.style.display = 'flex';
+                const content = modal.querySelector('.modal-content');
+                content.style.animation = 'none';
+                content.offsetHeight;
+                content.style.animation = 'fadeSlideUp 0.25s ease';
+            }
+            
+            function closeModal() {
+                modal.style.display = 'none';
+            }
+            
+            aboutBtn.addEventListener('click', openModal);
+            closeModalBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+        })();
+    </script>
+</body>
+</html>
