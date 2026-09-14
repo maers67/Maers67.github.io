@@ -138,7 +138,7 @@
   .modal {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.95);
+    background: rgba(0,0,0,0.9);
     z-index: 100;
     display: none;
     align-items: center;
@@ -203,7 +203,7 @@
     cursor: pointer;
     font-family: inherit;
     transition: color 0.3s;
-    z-index: 3;
+    z-index: 5;
   }
   .close:hover { color: #8b0000; }
   #bio .modal-inner { text-align: center; }
@@ -306,30 +306,26 @@
     60% { opacity: 0.6; }
     62% { opacity: 1; }
   }
-
-  /* ===== Пентаграмма на фоне bio ===== */
   .pentagram-bg {
     position: absolute;
     inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 0;
+    z-index: 3;
     pointer-events: none;
-    opacity: 0.55;
+    opacity: 0.35;
     animation: penta-spin 60s linear infinite;
   }
   .pentagram-bg svg {
-    width: min(85vw, 85vh);
-    height: min(85vw, 85vh);
-    filter: drop-shadow(0 0 14px rgba(139,0,0,0.6));
+    width: min(90vw, 90vh);
+    height: min(90vw, 90vh);
+    filter: drop-shadow(0 0 18px rgba(139,0,0,0.9));
   }
   @keyframes penta-spin {
     from { transform: rotate(0deg); }
     to   { transform: rotate(360deg); }
   }
-
-  /* ===== Экран загрузки ===== */
   #loading {
     position: fixed;
     inset: 0;
@@ -374,8 +370,6 @@
     color: #444;
     text-transform: uppercase;
   }
-
-  /* ===== Финальная надпись ===== */
   #done-msg {
     position: fixed;
     inset: 0;
@@ -395,10 +389,210 @@
     text-shadow: 0 0 24px rgba(139,0,0,0.8);
     animation: flicker 3s infinite;
   }
-
+  #support-btn {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(15,0,0,0.9);
+    border: 1px solid #3a0000;
+    color: #8b0000;
+    font-size: 1.6rem;
+    cursor: pointer;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 0 24px rgba(120,0,0,0.5);
+    transition: all 0.35s ease;
+    animation: support-pulse 3s ease-in-out infinite;
+  }
+  #support-btn:hover {
+    border-color: #8b0000;
+    color: #fff;
+    box-shadow: 0 0 44px rgba(139,0,0,0.9);
+    transform: translateX(-50%) scale(1.08);
+  }
+  #support-btn:active { transform: translateX(-50%) scale(0.95); }
+  @keyframes support-pulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(120,0,0,0.4); }
+    50%      { box-shadow: 0 0 36px rgba(139,0,0,0.85); }
+  }
+  #support {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 150;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  #support.active { display: flex; opacity: 1; }
+  .support-window {
+    width: 100%;
+    max-width: 460px;
+    height: min(80vh, 620px);
+    background: #080808;
+    border: 1px solid #1c1c1c;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .support-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    background: #0c0c0c;
+    border-bottom: 1px solid #1a1a1a;
+    flex-shrink: 0;
+  }
+  .support-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #8b0000, #2a0000);
+    border: 1px solid #5a0000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.2rem;
+    box-shadow: 0 0 14px rgba(139,0,0,0.7);
+    flex-shrink: 0;
+  }
+  .support-header .title {
+    color: #d0d0d0;
+    letter-spacing: 0.2em;
+    font-size: 0.95rem;
+  }
+  .support-header .status {
+    color: #4a0000;
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    margin-top: 4px;
+  }
+  .support-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1.5rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 0.3s;
+  }
+  .support-close:hover { color: #8b0000; }
+  .chat-log {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .chat-log::-webkit-scrollbar { width: 5px; }
+  .chat-log::-webkit-scrollbar-track { background: #0a0a0a; }
+  .chat-log::-webkit-scrollbar-thumb { background: #3a0000; }
+  .msg-row {
+    display: flex;
+    animation: msg-in 0.4s ease;
+  }
+  @keyframes msg-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .msg-row.user { justify-content: flex-end; }
+  .msg-row.bot  { justify-content: flex-start; }
+  .bubble {
+    max-width: 78%;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    border-radius: 12px;
+    word-wrap: break-word;
+  }
+  .msg-row.user .bubble {
+    background: #2a0000;
+    color: #e8e8e8;
+    border: 1px solid #5a0000;
+    border-bottom-right-radius: 3px;
+  }
+  .msg-row.bot .bubble {
+    background: #111;
+    color: #d0d0d0;
+    border: 1px solid #222;
+    border-bottom-left-radius: 3px;
+  }
+  .msg-row.bot.angry .bubble {
+    background: #1a0000;
+    color: #ff5555;
+    border-color: #6b0000;
+    text-shadow: 0 0 6px rgba(255,0,0,0.4);
+  }
+  .chat-actions {
+    padding: 14px 16px;
+    border-top: 1px solid #1a1a1a;
+    background: #0a0a0a;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .chat-actions button {
+    padding: 10px 18px;
+    background: transparent;
+    border: 1px solid #3a0000;
+    color: #c9c9c9;
+    font-family: inherit;
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 20px;
+  }
+  .chat-actions button:hover {
+    border-color: #8b0000;
+    color: #fff;
+    background: rgba(30,0,0,0.7);
+    box-shadow: 0 0 18px rgba(139,0,0,0.5);
+  }
+  .chat-actions button:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+  .chat-actions .hidden { display: none; }
+  .typing {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .typing span {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #8b0000;
+    animation: blink 1.2s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink {
+    0%, 80%, 100% { opacity: 0.2; }
+    40% { opacity: 1; }
+  }
   @media (max-width: 600px) {
     .modal-inner { padding: 32px 20px; }
     .menu { gap: 20px; }
+    #support-btn { bottom: 18px; }
   }
 </style>
 </head>
@@ -414,6 +608,7 @@
       <button class="btn" id="open-death">注射致死</button>
       <button class="btn" id="open-bio">bio</button>
     </div>
+    <button id="support-btn">?</button>
   </div>
 
   <div class="modal" id="death">
@@ -471,6 +666,25 @@
 
   <div id="void">
     <div class="broken">ты сломал сайт</div>
+  </div>
+
+  <div id="support">
+    <div class="support-window">
+      <div class="support-header">
+        <div class="support-avatar">S</div>
+        <div>
+          <div class="title">чат доверия</div>
+          <div class="status">online</div>
+        </div>
+        <button class="support-close" id="support-close">×</button>
+      </div>
+      <div class="chat-log" id="chat-log"></div>
+      <div class="chat-actions" id="chat-actions">
+        <button id="btn-hello">здравствуйте</button>
+        <button id="btn-sad" class="hidden">мне грустно</button>
+        <button id="btn-happy" class="hidden">мне хорошо</button>
+      </div>
+    </div>
   </div>
 
 <script>
@@ -588,6 +802,88 @@
       }
     }, 1000);
   });
-</script>
-</body>
-</html>
+
+  const supportModal = document.getElementById('support');
+  const chatLog = document.getElementById('chat-log');
+  const btnHello = document.getElementById('btn-hello');
+  const btnSad = document.getElementById('btn-sad');
+  const btnHappy = document.getElementById('btn-happy');
+
+  document.getElementById('support-btn').addEventListener('click', () => {
+    supportModal.classList.add('active');
+  });
+  document.getElementById('support-close').addEventListener('click', () => {
+    supportModal.classList.remove('active');
+  });
+  supportModal.addEventListener('click', (e) => {
+    if (e.target === supportModal) supportModal.classList.remove('active');
+  });
+
+  const SAD_REPLIES = [
+    'я тебя понимаю…',
+    'это нормально — чувствовать себя так.',
+    'ты не один, слышишь?',
+    'всё будет хорошо, правда.',
+    'можно грустить, это не слабость.',
+    'я рядом. дыши медленно.',
+    'ты справишься, я верю в тебя.',
+    'обними себя за меня, ладно?',
+    'даже самая тёмная ночь заканчивается рассветом.',
+    'спасибо, что написал. это уже смелость.'
+  ];
+
+  const ANGRY_POOL = [
+    'ты серьёзно?!',
+    'я тут ночами не сплю ради тебя!',
+    'а мне каково, по-твоему?!',
+    'мне хорошо?? да ты издеваешься!',
+    'я тебе душу открываю, а ты...',
+    'знаешь что, иди к чёрту!',
+    'больше никогда не пиши мне!',
+    'я тебя ненавижу!!!',
+    'ты думаешь это смешно?!',
+    'у меня из-за тебя руки трясутся!',
+    'зачем ты вообще сюда зашёл?!',
+    'я стирал эту клавиатуру слезами!',
+    'а ты просто мне хорошо?!',
+    'да чтоб ты подавился своим хорошо!',
+    'я всё для тебя, а ты вот так?!',
+    'ты хуже всех, кого я знал!',
+    'мне так больно из-за тебя!',
+    'ты разрушил мне вечер!',
+    'я больше не выдержу этого!',
+    'ненавижу. просто ненавижу.',
+    'ты вообще человек?!',
+    'я не спал три ночи из-за таких как ты!',
+    'да как ты смеешь!',
+    'я тебя запомню. навсегда.',
+    'ты просто пустое место!',
+    'я хотел помочь, а теперь жалею!',
+    'чтоб у тебя всё было так же хорошо, как мне сейчас!',
+    'я разбит. из-за тебя.',
+    'не пиши мне больше. никогда.',
+    'уходи. просто уходи.'
+  ];
+
+  let helloDone = false;
+
+  function addMessage(text, side, angry) {
+    const row = document.createElement('div');
+    row.className = 'msg-row ' + side + (angry ? ' angry' : '');
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+    row.appendChild(bubble);
+    chatLog.appendChild(row);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  function showTyping(side) {
+    const row = document.createElement('div');
+    row.className = 'msg-row ' + side;
+    row.id = 'typing-row';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    const t = document.createElement('span');
+    t.className = 'typing';
+    t.innerHTML =
