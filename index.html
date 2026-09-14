@@ -1,345 +1,440 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title> maers </title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>maers</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow-x: hidden; }
 
-        body {
-            /* Очень тёмный, с едва уловимым кроваво-дымным оттенком */
-            background: radial-gradient(circle at 50% 30%, #0e0a0c 0%, #050305 100%);
-            min-height: 100vh;
-            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, 'Roboto', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
+  body {
+    font-family: 'Courier New', Courier, monospace;
+    background: #050505;
+    color: #d8d8d8;
+    -webkit-tap-highlight-color: transparent;
+  }
 
-        /* Канвас с падающими символами — делаем их тусклыми, угольными */
-        #symbol-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-            opacity: 0.55;
-        }
+  /* ===== ГЛАВНЫЙ ЭКРАН (первая страница) ===== */
+  #page1 {
+    position: fixed;
+    inset: 0;
+    /* ЗДЕСЬ МЕНЯЕШЬ КАРТИНКУ: вставь свою ссылку или путь к файлу */
+    background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    z-index: 10;
+  }
 
-        /* Главная карточка — как «свет в конце туннеля» */
-        .glass-card {
-            position: relative;
-            z-index: 10;
-            background: rgba(8, 5, 7, 0.75);
-            backdrop-filter: blur(16px);
-            border-radius: 2.5rem;
-            padding: 2.5rem 2rem;
-            width: 100%;
-            max-width: 580px;
-            text-align: center;
-            box-shadow: 0 0 40px rgba(255, 90, 30, 0.25), 0 0 0 1px rgba(180, 70, 30, 0.4);
-            border: 1px solid rgba(220, 100, 40, 0.5);
-            transition: transform 0.2s ease, box-shadow 0.3s ease;
-        }
+  /* Затемнение поверх картинки, чтобы текст читался */
+  #page1::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(0,0,0,0.55) 0%,
+      rgba(0,0,0,0.85) 60%,
+      rgba(0,0,0,0.97) 100%
+    );
+  }
 
-        .glass-card:hover {
-            transform: scale(1.01);
-            box-shadow: 0 0 60px rgba(255, 80, 20, 0.4);
-        }
+  /* Надпись "maers" по центру */
+  .maers-title {
+    position: relative;
+    z-index: 2;
+    font-size: clamp(3rem, 14vw, 10rem);
+    font-weight: 700;
+    letter-spacing: 0.4em;
+    text-transform: lowercase;
+    color: #ececec;
+    cursor: pointer;
+    user-select: none;
+    text-shadow: 0 0 30px rgba(0,0,0,1), 0 0 60px rgba(0,0,0,0.8);
+    transition: letter-spacing 0.4s ease, opacity 0.4s ease;
+    padding-left: 0.4em;
+  }
 
-        /* Заголовок MAERS — тлеющий уголь, свет в темноте */
-        .glow-title {
-            font-size: 4.8rem;
-            font-weight: 800;
-            letter-spacing: 6px;
-            background: linear-gradient(135deg, #ffb47b, #ff6a2e, #c03b00);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            text-shadow: 0 0 20px rgba(255, 70, 0, 0.6);
-            margin-bottom: 2rem;
-            word-break: keep-all;
-        }
+  .maers-title:hover {
+    letter-spacing: 0.55em;
+    opacity: 0.85;
+  }
 
-        .buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-            margin-top: 1rem;
-        }
+  .maers-title.fade-out {
+    opacity: 0;
+    transform: scale(1.1);
+  }
 
-        /* Кнопки как ржавый металл с тёплым светом */
-        .btn {
-            padding: 14px 20px;
-            font-size: 1.3rem;
-            font-weight: 600;
-            border: none;
-            border-radius: 60px;
-            background: rgba(20, 12, 10, 0.95);
-            backdrop-filter: blur(4px);
-            color: #ffcca7;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 100, 30, 0.2);
-            border: 1px solid rgba(200, 80, 30, 0.6);
-            font-family: inherit;
-        }
+  #page1.hide {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(1.05);
+  }
 
-        .btn:hover {
-            transform: translateY(-5px) scale(1.02);
-            background: #9b3a0e;
-            color: #fff0e0;
-            box-shadow: 0 12px 24px rgba(180, 50, 0, 0.5);
-            border-color: #ff884d;
-        }
+  /* ===== ВТОРАЯ СТРАНИЦА (меню с кнопками) ===== */
+  #page2 {
+    position: fixed;
+    inset: 0;
+    background: #030303;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 5;
+    overflow: hidden;
+  }
 
-        .btn:active {
-            transform: scale(0.97);
-            transition: 0.05s;
-        }
+  #page2.active { display: flex; }
 
-        /* Модальное окно — как тёмная комната с лампой */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.92);
-            backdrop-filter: blur(12px);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
+  /* Контейнер для падающих иероглифов */
+  #rain {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 1;
+    pointer-events: none;
+  }
 
-        .modal-content {
-            background: #120b09;
-            border-radius: 2rem;
-            max-width: 460px;
-            width: 100%;
-            padding: 2rem 1.8rem;
-            text-align: center;
-            border: 1px solid #d45a1c;
-            box-shadow: 0 0 40px rgba(200, 60, 0, 0.3);
-            animation: fadeSlideUp 0.3s ease;
-        }
+  /* Один падающий иероглиф */
+  .glyph {
+    position: absolute;
+    top: -60px;
+    color: #6b0000;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    opacity: 0;
+    text-shadow: 0 0 8px rgba(120,0,0,0.8);
+    animation: fall linear infinite;
+    will-change: transform;
+  }
 
-        .modal-content p {
-            font-size: 1.2rem;
-            line-height: 1.65;
-            color: #ffdbbc;
-            margin: 1rem 0 1.5rem;
-            text-align: center;
-            text-shadow: 0 0 2px #340e00;
-        }
+  @keyframes fall {
+    0%   { transform: translateY(-60px); opacity: 0; }
+    10%  { opacity: 0.9; }
+    90%  { opacity: 0.9; }
+    100% { transform: translateY(110vh); opacity: 0; }
+  }
 
-        .close-modal {
-            background: #632a0c;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 40px;
-            font-weight: bold;
-            color: #ffc8a2;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.2s;
-            border: 1px solid #b1531a;
-        }
+  /* Меню кнопок */
+  .menu {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding: 0 24px;
+    width: 100%;
+    max-width: 420px;
+  }
 
-        .close-modal:hover {
-            background: #a3410e;
-            color: white;
-            transform: scale(1.02);
-        }
+  /* Стиль кнопок */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 20px 24px;
+    background: rgba(10,10,10,0.85);
+    border: 1px solid #1e1e1e;
+    color: #c9c9c9;
+    font-family: inherit;
+    font-size: clamp(1rem, 3.5vw, 1.25rem);
+    letter-spacing: 0.2em;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.35s ease;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
 
-        @keyframes fadeSlideUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+  .btn:hover {
+    border-color: #6b0000;
+    color: #fff;
+    background: rgba(20,0,0,0.9);
+    letter-spacing: 0.3em;
+    box-shadow: 0 0 30px rgba(120,0,0,0.5);
+  }
 
-        @media (max-width: 550px) {
-            .glow-title {
-                font-size: 3rem;
-                letter-spacing: 3px;
-            }
-            .btn {
-                font-size: 1.1rem;
-                padding: 12px 16px;
-            }
-            .glass-card {
-                padding: 1.8rem 1.2rem;
-            }
-            .modal-content p {
-                font-size: 1rem;
-            }
-        }
+  .btn:active { transform: scale(0.98); }
 
-        footer {
-            margin-top: 2rem;
-            font-size: 0.7rem;
-            opacity: 0.55;
-            color: #b87a54;
-        }
-    </style>
+  /* ===== МОДАЛЬНЫЕ ОКНА (всплывающие) ===== */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.95);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .modal.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  .modal-inner {
+    max-width: 720px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 40px 32px;
+    background: #080808;
+    border: 1px solid #1c1c1c;
+    position: relative;
+  }
+
+  .modal-inner::-webkit-scrollbar { width: 6px; }
+  .modal-inner::-webkit-scrollbar-track { background: #0a0a0a; }
+  .modal-inner::-webkit-scrollbar-thumb { background: #3a0000; }
+
+  .modal h2 {
+    font-size: clamp(1.1rem, 3.5vw, 1.4rem);
+    letter-spacing: 0.3em;
+    color: #8b0000;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+
+  .modal p {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    line-height: 1.9;
+    color: #b5b5b5;
+    margin-bottom: 16px;
+    text-align: justify;
+  }
+
+  .modal .cn {
+    font-family: 'Courier New', monospace;
+    color: #d0d0d0;
+    line-height: 2.1;
+  }
+
+  /* Кнопка "×" закрытия модалки */
+  .close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1.6rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 0.3s;
+  }
+
+  .close:hover { color: #8b0000; }
+
+  /* ===== BIO МОДАЛКА ===== */
+  #bio .modal-inner { text-align: center; }
+
+  #bio .tagline {
+    font-size: clamp(1.4rem, 5vw, 2.4rem);
+    letter-spacing: 0.25em;
+    color: #e8e8e8;
+    margin: 20px 0 40px;
+    text-transform: lowercase;
+  }
+
+  /* Кнопка "далее" */
+  #next-btn {
+    margin-top: 10px;
+    padding: 16px 48px;
+    background: transparent;
+    border: 1px solid #3a3a3a;
+    color: #c9c9c9;
+    font-family: inherit;
+    font-size: clamp(0.9rem, 3vw, 1.05rem);
+    letter-spacing: 0.35em;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    text-transform: lowercase;
+  }
+
+  #next-btn:hover {
+    border-color: #8b0000;
+    color: #fff;
+    box-shadow: 0 0 40px rgba(139,0,0,0.6);
+  }
+
+  /* ===== ЭФФЕКТ РАССЫПАНИЯ ===== */
+  .crumble {
+    animation: crumble 1.6s forwards;
+  }
+
+  @keyframes crumble {
+    0%   { filter: blur(0); opacity: 1; transform: scale(1); }
+    40%  { filter: blur(2px); opacity: 0.8; }
+    100% { filter: blur(20px); opacity: 0; transform: scale(1.3) rotate(2deg); }
+  }
+
+  /* Пустой чёрный экран после рассыпания */
+  #void {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: #2a2a2a;
+    font-size: clamp(0.8rem, 2.5vw, 1rem);
+    letter-spacing: 0.5em;
+    text-align: center;
+    padding: 20px;
+  }
+
+  #void.active { display: flex; }
+
+  /* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ===== */
+  @media (max-width: 600px) {
+    .modal-inner { padding: 32px 20px; }
+    .menu { gap: 20px; }
+  }
+</style>
 </head>
 <body>
 
-    <canvas id="symbol-canvas"></canvas>
+  <!-- ========== СТРАНИЦА 1: картинка + надпись maers ========== -->
+  <div id="page1">
+    <!-- Клик по этой надписи открывает вторую страницу -->
+    <div class="maers-title" id="enter">maers</div>
+  </div>
 
-    <div class="glass-card">
-        <h1 class="glow-title">maers</h1>
-        <div class="buttons">
-            <button class="btn" id="tgBtn">my Telegram</button>
-            <button class="btn" id="aboutBtn">my bio</button>
-        </div>
-        <footer> ;) </footer>
+  <!-- ========== СТРАНИЦА 2: меню ========== -->
+  <div id="page2">
+    <!-- Сюда JS насыпает падающие иероглифы -->
+    <div id="rain"></div>
+
+    <div class="menu">
+      <!-- Кнопка telegram: меняешь ник в ссылке если надо -->
+      <a class="btn" href="https://t.me/googlefreak" target="_blank" rel="noopener">telegram</a>
+
+      <!-- Кнопка "注射致死" открывает модалку с историей -->
+      <button class="btn" id="open-death">注射致死</button>
+
+      <!-- Кнопка "bio" открывает модалку с био -->
+      <button class="btn" id="open-bio">bio</button>
     </div>
+  </div>
 
-    <div id="aboutModal" class="modal">
-        <div class="modal-content">
-            <h2 style="color:#ffa十五;">maers</h2>
-            <p>
-                Мне 17 лет. Мой никнейм maers был придуман в 2021 году. 
-                Занимаюсь кодингом на уровне хобби, также рисую. 
-                Учусь в 10 классе, проживаю в России.
-            </p>
-            <button class="close-modal">Закрыть</button>
-        </div>
+  <!-- ========== МОДАЛКА: ИСТОРИЯ (注射致死) ========== -->
+  <div class="modal" id="death">
+    <div class="modal-inner">
+      <button class="close" data-close="death">×</button>
+      <h2>注射致死</h2>
+      <!-- Текст истории на китайском. Меняй текст внутри <p> если надо -->
+      <p class="cn">
+        他叫 Daniel，二十四岁，来自一个安静的小城。那天晚上，他和几个朋友在公寓里，桌上散落着几支没有标记的注射器。没有人知道里面装的是什么，也没有人问。他卷起袖子，像做过一百次那样熟练。针头刺入皮肤的那一刻，他还在笑。三十秒后，笑容凝固。他的瞳孔开始涣散，呼吸变浅，然后是抽搐。朋友们慌了，打电话叫救护车，但地址说错了。等救护车到的时候，他的心脏已经停了十七分钟。医生说他死于急性多重药物中毒。他的手机里还留着未发送的消息：「我没事，别担心。」那条消息，永远停在了草稿箱里。
+      </p>
+      <p class="cn">
+        后来警察在房间里找到了三种不同的物质残留。没有人被起诉。他的母亲在葬礼上一直重复一句话：「他昨天还给我打电话。」房间被清空，墙上的海报被撕下，但墙角还有一道浅浅的划痕，是他最后倒下时指甲留下的。
+      </p>
     </div>
+  </div>
 
-    <script>
-        (function() {
-            const canvas = document.getElementById('symbol-canvas');
-            let ctx = canvas.getContext('2d');
-            let width, height;
-            let symbolsArray = [];
-            
-            // Символы — мрачные, как обрывки шифра
-            const symbolSet = [
-                '焚', '燼', '影', '闇', '血', '骨', '零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十',
-                '咒', '封印', '令', '符', '祭', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '◈', '✧', '⸸', '☠'
-            ];
-            
-            function randomSymbol() {
-                return symbolSet[Math.floor(Math.random() * symbolSet.length)];
-            }
-            
-            function initCanvas() {
-                width = window.innerWidth;
-                height = window.innerHeight;
-                canvas.width = width;
-                canvas.height = height;
-                
-                const columns = Math.floor(width / 28);
-                symbolsArray = [];
-                for (let i = 0; i < columns * 2; i++) {
-                    symbolsArray.push({
-                        x: Math.random() * width,
-                        y: Math.random() * height - height,
-                        speed: 0.8 + Math.random() * 2.5,
-                        symbol: randomSymbol(),
-                        size: 16 + Math.random() * 14,
-                        opacity: 0.2 + Math.random() * 0.45
-                    });
-                }
-            }
-            
-            function drawRain() {
-                if (!ctx) return;
-                ctx.clearRect(0, 0, width, height);
-                ctx.shadowBlur = 0;
-                for (let s of symbolsArray) {
-                    ctx.font = `${s.size}px "Segoe UI", "Noto Sans CJK SC", monospace`;
-                    // цвет — ржавый, угольно-золотой
-                    ctx.fillStyle = `rgba(200, 90, 30, ${s.opacity * 0.8})`;
-                    ctx.fillText(s.symbol, s.x, s.y);
-                    
-                    s.y += s.speed;
-                    if (s.y > height + 50) {
-                        s.y = -40;
-                        s.x = Math.random() * width;
-                        s.symbol = randomSymbol();
-                        s.opacity = 0.2 + Math.random() * 0.5;
-                    }
-                    s.x += (Math.random() - 0.5) * 0.2;
-                    if (s.x < -20) s.x = width + 10;
-                    if (s.x > width + 20) s.x = -20;
-                }
-                requestAnimationFrame(drawRain);
-            }
-            
-            function resizeCanvas() {
-                width = window.innerWidth;
-                height = window.innerHeight;
-                canvas.width = width;
-                canvas.height = height;
-                const columns = Math.floor(width / 28);
-                symbolsArray = [];
-                for (let i = 0; i < columns * 2; i++) {
-                    symbolsArray.push({
-                        x: Math.random() * width,
-                        y: Math.random() * height,
-                        speed: 0.8 + Math.random() * 2.8,
-                        symbol: randomSymbol(),
-                        size: 16 + Math.random() * 14,
-                        opacity: 0.2 + Math.random() * 0.45
-                    });
-                }
-            }
-            
-            window.addEventListener('resize', () => {
-                resizeCanvas();
-            });
-            
-            initCanvas();
-            drawRain();
-            
-            const tgBtn = document.getElementById('tgBtn');
-            tgBtn.addEventListener('click', () => {
-                window.open('https://t.me/googlefreak', '_blank');
-            });
-            
-            const aboutBtn = document.getElementById('aboutBtn');
-            const modal = document.getElementById('aboutModal');
-            const closeModalBtn = document.querySelector('.close-modal');
-            
-            function openModal() {
-                modal.style.display = 'flex';
-                const content = modal.querySelector('.modal-content');
-                content.style.animation = 'none';
-                content.offsetHeight;
-                content.style.animation = 'fadeSlideUp 0.25s ease';
-            }
-            
-            function closeModal() {
-                modal.style.display = 'none';
-            }
-            
-            aboutBtn.addEventListener('click', openModal);
-            closeModalBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeModal();
-            });
-        })();
-    </script>
+  <!-- ========== МОДАЛКА: BIO ========== -->
+  <div class="modal" id="bio">
+    <div class="modal-inner">
+      <button class="close" data-close="bio">×</button>
+      <h2>bio</h2>
+      <div class="tagline">maers — this generation</div>
+      <!-- Эта кнопка запускает рассыпание -->
+      <button id="next-btn">далее</button>
+    </div>
+  </div>
+
+  <!-- ========== ФИНАЛЬНЫЙ ЧЁРНЫЙ ЭКРАН ========== -->
+  <div id="void">обнови страницу</div>
+
+<script>
+  /* ===== Переход со страницы 1 на страницу 2 ===== */
+  const enter  = document.getElementById('enter');   // надпись maers
+  const page1  = document.getElementById('page1');
+  const page2  = document.getElementById('page2');
+
+  enter.addEventListener('click', () => {
+    enter.classList.add('fade-out');       // надпись плавно исчезает
+    setTimeout(() => {
+      page1.classList.add('hide');         // скрываем первую страницу
+      page2.classList.add('active');       // показываем вторую
+      startRain();                         // запускаем падающие иероглифы
+    }, 600);
+  });
+
+  /* ===== Падающие иероглифы на второй странице ===== */
+  // Список слов. Можешь добавить/убрать свои
+  const glyphs = ['死','血','暗','恐','冥','罪','亡','獄','髑','喪','屠','蝕','鬼','骸','棺','黙','惨','呪','瘡','亡霊','窒息','断頭'];
+  const rain = document.getElementById('rain');
+  let rainStarted = false;
+
+  function startRain() {
+    if (rainStarted) return;   // защита от повторного запуска
+    rainStarted = true;
+
+    // Сколько слов на экране: меньше на телефоне, больше на ПК
+    const count = window.innerWidth < 600 ? 28 : 55;
+
+    for (let i = 0; i < count; i++) {
+      const g = document.createElement('span');
+      g.className = 'glyph';
+      g.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+      g.style.left = Math.random() * 100 + '%';                    // случайная позиция по горизонтали
+      g.style.fontSize = (12 + Math.random() * 22) + 'px';         // случайный размер
+      g.style.animationDuration = (6 + Math.random() * 10) + 's';  // случайная скорость
+      g.style.animationDelay = (Math.random() * 12) + 's';         // случайная задержка старта
+      rain.appendChild(g);
+    }
+  }
+
+  /* ===== Открытие модалок ===== */
+  document.getElementById('open-death').addEventListener('click', () => {
+    document.getElementById('death').classList.add('active');
+  });
+
+  document.getElementById('open-bio').addEventListener('click', () => {
+    document.getElementById('bio').classList.add('active');
+  });
+
+  /* ===== Закрытие модалок (крестик) ===== */
+  document.querySelectorAll('[data-close]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById(btn.dataset.close).classList.remove('active');
+    });
+  });
+
+  /* ===== Закрытие модалок кликом по фону ===== */
+  document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', e => {
+      if (e.target === m) m.classList.remove('active');
+    });
+  });
+
+  /* ===== Кнопка "далее" → рассыпание и чёрный экран ===== */
+  document.getElementById('next-btn').addEventListener('click', () => {
+    // Закрываем все модалки
+    document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+
+    // Запускаем анимацию рассыпания
+    document.body.classList.add('crumble');
+
+    // Через 1.4 сек скрываем всё кроме чёрного экрана
+    setTimeout(() => {
+      document.querySelectorAll('body > *').forEach(el => {
+        if (el.id !== 'void') el.style.display = 'none';
+      });
+      document.getElementById('void').classList.add('active');
+    }, 1400);
+  });
+</script>
 </body>
 </html>
