@@ -686,7 +686,6 @@
       </div>
     </div>
   </div>
-
 <script>
   const enter = document.getElementById('enter');
   const page1 = document.getElementById('page1');
@@ -812,9 +811,11 @@
   document.getElementById('support-btn').addEventListener('click', () => {
     supportModal.classList.add('active');
   });
+
   document.getElementById('support-close').addEventListener('click', () => {
     supportModal.classList.remove('active');
   });
+
   supportModal.addEventListener('click', (e) => {
     if (e.target === supportModal) supportModal.classList.remove('active');
   });
@@ -881,3 +882,79 @@
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
     bubble.textContent = text;
+    row.appendChild(bubble);
+    chatLog.appendChild(row);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  function showTyping() {
+    const row = document.createElement('div');
+    row.className = 'msg-row bot';
+    row.id = 'typing-row';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    const t = document.createElement('span');
+    t.className = 'typing';
+    const d1 = document.createElement('span');
+    const d2 = document.createElement('span');
+    const d3 = document.createElement('span');
+    t.appendChild(d1);
+    t.appendChild(d2);
+    t.appendChild(d3);
+    bubble.appendChild(t);
+    row.appendChild(bubble);
+    chatLog.appendChild(row);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  function removeTyping() {
+    const t = document.getElementById('typing-row');
+    if (t) t.remove();
+  }
+
+  function botSay(text, angry, delay) {
+    showTyping();
+    setTimeout(() => {
+      removeTyping();
+      addMessage(text, 'bot', angry);
+    }, delay || 800);
+  }
+
+  btnHello.addEventListener('click', () => {
+    addMessage('здравствуйте', 'user', false);
+    btnHello.disabled = true;
+    setTimeout(() => {
+      botSay('здравствуйте. это чат доверия. я здесь, чтобы выслушать вас. как вы себя чувствуете?', false, 900);
+      setTimeout(() => {
+        btnSad.classList.remove('hidden');
+        btnHappy.classList.remove('hidden');
+      }, 900);
+    }, 400);
+  });
+
+  btnSad.addEventListener('click', () => {
+    addMessage('мне грустно', 'user', false);
+    btnSad.disabled = true;
+    btnHappy.disabled = true;
+    const replies = pickRandom(SAD_REPLIES, 3);
+    replies.forEach((r, i) => {
+      setTimeout(() => {
+        botSay(r, false, 700);
+      }, i * 1400);
+    });
+  });
+
+  btnHappy.addEventListener('click', () => {
+    addMessage('мне хорошо', 'user', false);
+    btnHappy.disabled = true;
+    btnSad.disabled = true;
+    const angry = pickRandom(ANGRY_POOL, 10);
+    angry.forEach((r, i) => {
+      setTimeout(() => {
+        botSay(r, true, 500);
+      }, i * 1100);
+    });
+  });
+</script>
+</body>
+</html>
