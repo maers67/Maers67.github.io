@@ -527,25 +527,6 @@
     border-color: #6b0000;
     text-shadow: 0 0 6px rgba(255,0,0,0.4);
   }
-  .msg-row.anon {
-    justify-content: flex-start;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-  }
-  .msg-row.anon .anon-name {
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
-    color: #5a7a9a;
-    margin-left: 4px;
-    text-transform: lowercase;
-  }
-  .msg-row.anon .bubble {
-    background: #0d1418;
-    color: #b8c8d4;
-    border: 1px solid #24343d;
-    border-bottom-left-radius: 3px;
-  }
   .system-row {
     text-align: center;
     color: #4a4a4a;
@@ -604,6 +585,108 @@
   @keyframes blink {
     0%, 80%, 100% { opacity: 0.2; }
     40% { opacity: 1; }
+  }
+  #anon-banner {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-140%);
+    width: min(92vw, 440px);
+    background: #0d1418;
+    border: 1px solid #24343d;
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 300;
+    cursor: pointer;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.8), 0 0 20px rgba(50,80,100,0.25);
+    transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2), opacity 0.4s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  #anon-banner.show {
+    transform: translateX(-50%) translateY(0);
+  }
+  #anon-banner.hide {
+    transform: translateX(-50%) translateY(-140%);
+    opacity: 0;
+  }
+  #anon-banner .anon-avatar-sm {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #2a3f4a, #0d1418);
+    border: 1px solid #35505d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8fb0c4;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  #anon-banner .anon-body {
+    flex: 1;
+    min-width: 0;
+  }
+  #anon-banner .anon-title {
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    color: #8fb0c4;
+    text-transform: lowercase;
+    margin-bottom: 3px;
+  }
+  #anon-banner .anon-preview {
+    font-size: 0.85rem;
+    color: #b8c8d4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #anon-banner .anon-badge {
+    font-size: 0.65rem;
+    color: #4a6a7a;
+    letter-spacing: 0.2em;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  #anon-chat {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 250;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  #anon-chat.active { display: flex; opacity: 1; }
+  .anon-window {
+    width: 100%;
+    max-width: 460px;
+    height: min(80vh, 620px);
+    background: #080808;
+    border: 1px solid #1c2830;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .anon-window .support-avatar {
+    background: radial-gradient(circle at 30% 30%, #2a3f4a, #0d1418);
+    border: 1px solid #35505d;
+    color: #8fb0c4;
+    box-shadow: 0 0 14px rgba(50,90,110,0.6);
+  }
+  .anon-window .title { color: #b8c8d4; }
+  .anon-window .status { color: #4a6a7a; }
+  .anon-window .bubble {
+    background: #0d1418;
+    color: #b8c8d4;
+    border: 1px solid #24343d;
   }
   @media (max-width: 600px) {
     .modal-inner { padding: 32px 20px; }
@@ -691,7 +774,32 @@
         <button id="btn-hello">здравствуйте</button>
         <button id="btn-sad" class="hidden">мне грустно</button>
         <button id="btn-happy" class="hidden">мне хорошо</button>
-        <button id="btn-reply" class="hidden">ответить</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="anon-banner">
+    <div class="anon-avatar-sm">A</div>
+    <div class="anon-body">
+      <div class="anon-title">анонимный пользователь</div>
+      <div class="anon-preview">привет</div>
+    </div>
+    <div class="anon-badge">сейчас</div>
+  </div>
+
+  <div id="anon-chat">
+    <div class="anon-window support-window">
+      <div class="support-header">
+        <div class="support-avatar">A</div>
+        <div>
+          <div class="title">анонимный пользователь</div>
+          <div class="status">online</div>
+        </div>
+        <button class="support-close" id="anon-close">×</button>
+      </div>
+      <div class="chat-log" id="anon-log"></div>
+      <div class="chat-actions" id="anon-actions">
+        <button id="btn-anon-reply" class="hidden">ответить</button>
       </div>
     </div>
   </div>
@@ -831,7 +939,6 @@
   const btnHello = document.getElementById('btn-hello');
   const btnSad = document.getElementById('btn-sad');
   const btnHappy = document.getElementById('btn-happy');
-  const btnReply = document.getElementById('btn-reply');
 
   document.getElementById('support-btn').addEventListener('click', () => {
     supportModal.classList.add('active');
@@ -918,29 +1025,6 @@
     chatLog.scrollTop = chatLog.scrollHeight;
   }
 
-  function addAnonMessage(text) {
-    const row = document.createElement('div');
-    row.className = 'msg-row anon';
-    const name = document.createElement('div');
-    name.className = 'anon-name';
-    name.textContent = 'анонимный пользователь';
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.textContent = text;
-    row.appendChild(name);
-    row.appendChild(bubble);
-    chatLog.appendChild(row);
-    chatLog.scrollTop = chatLog.scrollHeight;
-  }
-
-  function addSystem(text) {
-    const row = document.createElement('div');
-    row.className = 'system-row';
-    row.textContent = text;
-    chatLog.appendChild(row);
-    chatLog.scrollTop = chatLog.scrollHeight;
-  }
-
   function showTyping() {
     const row = document.createElement('div');
     row.className = 'msg-row bot';
@@ -973,8 +1057,7 @@
       addMessage(text, 'bot', angry);
     }, delay || 800);
   }
-!
- 
+
   btnHello.addEventListener('click', () => {
     addMessage('здравствуйте', 'user', false);
     btnHello.disabled = true;
@@ -999,35 +1082,147 @@
     });
   });
 
-  const ANON_STEPS = [
-    {
-      user: 'привет, ты кто?',
-      anon: 'я скучаю, вновь ты думаешь обо мне',
-      reply: '…'
-    },
-    {
-      user: 'мне до сих пор бывает обидно из-за тебя..',
-      anon: 'прости',
-      reply: null
-    }
-  ];
+  const anonBanner = document.getElementById('anon-banner');
+  const anonChat = document.getElementById('anon-chat');
+  const anonLog = document.getElementById('anon-log');
+  const btnAnonReply = document.getElementById('btn-anon-reply');
+  const anonClose = document.getElementById('anon-close');
+
+  let anonClosed = false;
+  let anonStep = 0;
+  let anonBannerTimer = null;
 
   const ANON_DIALOG = [
     {
       user: 'привет, ты кто?',
-      anon: 'я скучаю, вновь ты думаешь обо мне'
+      anon: 'пожалуйста, прекрати думать обо мне, прекрати сюда возвращаться'
     },
     {
       user: '…',
-      anon: 'мне до сих пор бывает обидно из-за тебя..'
-    },
-    {
-      user: 'прости',
-      anon: 'пожалуйста, хватит сюда возвращаться'
+      anon: null
     }
   ];
 
-  let anonIndex = 0;
+  function anonAddMessage(text, side) {
+    const row = document.createElement('div');
+    row.className = 'msg-row ' + side;
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+    row.appendChild(bubble);
+    anonLog.appendChild(row);
+    anonLog.scrollTop = anonLog.scrollHeight;
+  }
+
+  function anonAddSystem(text) {
+    const row = document.createElement('div');
+    row.className = 'system-row';
+    row.textContent = text;
+    anonLog.appendChild(row);
+    anonLog.scrollTop = anonLog.scrollHeight;
+  }
+
+  function anonTyping(callback, delay) {
+    const row = document.createElement('div');
+    row.className = 'msg-row bot';
+    row.id = 'anon-typing-row';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    const t = document.createElement('span');
+    t.className = 'typing';
+    const d1 = document.createElement('span');
+    const d2 = document.createElement('span');
+    const d3 = document.createElement('span');
+    t.appendChild(d1);
+    t.appendChild(d2);
+    t.appendChild(d3);
+    bubble.appendChild(t);
+    row.appendChild(bubble);
+    anonLog.appendChild(row);
+    anonLog.scrollTop = anonLog.scrollHeight;
+
+    setTimeout(() => {
+      const el = document.getElementById('anon-typing-row');
+      if (el) el.remove();
+      callback();
+    }, delay || 900);
+  }
+
+  function showAnonBanner() {
+    if (anonClosed) return;
+    anonBanner.classList.remove('hide');
+    anonBanner.classList.add('show');
+
+    anonBannerTimer = setTimeout(() => {
+      anonBanner.classList.remove('show');
+      anonBanner.classList.add('hide');
+    }, 7000);
+  }
+
+  anonBanner.addEventListener('click', () => {
+    if (anonClosed) return;
+    if (anonBannerTimer) clearTimeout(anonBannerTimer);
+    anonBanner.classList.remove('show');
+    anonBanner.classList.add('hide');
+    anonChat.classList.add('active');
+
+    if (anonLog.children.length === 0) {
+      anonTyping(() => {
+        anonAddMessage('привет', 'bot');
+        btnAnonReply.classList.remove('hidden');
+      }, 900);
+    }
+  });
+
+  anonClose.addEventListener('click', () => {
+    anonChat.classList.remove('active');
+    anonClosed = true;
+    anonBanner.classList.remove('show');
+    anonBanner.classList.add('hide');
+  });
+
+  anonChat.addEventListener('click', (e) => {
+    if (e.target === anonChat) {
+      anonChat.classList.remove('active');
+      anonClosed = true;
+      anonBanner.classList.remove('show');
+      anonBanner.classList.add('hide');
+    }
+  });
+
+  btnAnonReply.addEventListener('click', () => {
+    if (anonStep >= ANON_DIALOG.length) return;
+
+    const step = ANON_DIALOG[anonStep];
+    btnAnonReply.disabled = true;
+    btnAnonReply.classList.add('hidden');
+
+    anonAddMessage(step.user, 'user');
+
+    if (step.anon) {
+      setTimeout(() => {
+        anonTyping(() => {
+          anonAddMessage(step.anon, 'bot');
+          anonStep++;
+          if (anonStep < ANON_DIALOG.length) {
+            setTimeout(() => {
+              btnAnonReply.disabled = false;
+              btnAnonReply.classList.remove('hidden');
+            }, 600);
+          }
+        }, 1000);
+      }, 700);
+    } else {
+      anonStep++;
+      setTimeout(() => {
+        anonTyping(() => {
+          anonAddSystem('вы были добавлены в чёрный список');
+          btnAnonReply.disabled = false;
+          btnAnonReply.classList.add('hidden');
+        }, 1100);
+      }, 700);
+    }
+  });
 
   btnHappy.addEventListener('click', () => {
     addMessage('мне хорошо', 'user', false);
@@ -1042,41 +1237,7 @@
     });
 
     const totalAngryTime = 10 * 900 + 800;
-
-    setTimeout(() => {
-      addAnonMessage('привет');
-      btnReply.classList.remove('hidden');
-    }, totalAngryTime + 2500);
-  });
-
-  btnReply.addEventListener('click', () => {
-    if (anonIndex >= ANON_DIALOG.length) return;
-
-    const step = ANON_DIALOG[anonIndex];
-    btnReply.disabled = true;
-
-    addMessage(step.user, 'user', false);
-
-    setTimeout(() => {
-      addAnonMessage(step.anon);
-      anonIndex++;
-
-      if (anonIndex < ANON_DIALOG.length) {
-        setTimeout(() => {
-          btnReply.disabled = false;
-        }, 800);
-      } else {
-        setTimeout(() => {
-          addSystem('анонимный пользователь покинул чат');
-          btnReply.classList.add('hidden');
-          btnReply.disabled = false;
-
-          setTimeout(() => {
-            botSay('бывает, крепись..', false, 1500);
-          }, 1800);
-        }, 1200);
-      }
-    }, 1000);
+    setTimeout(showAnonBanner, totalAngryTime + 1500);
   });
 </script>
 </body>
