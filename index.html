@@ -527,6 +527,34 @@
     border-color: #6b0000;
     text-shadow: 0 0 6px rgba(255,0,0,0.4);
   }
+  .msg-row.anon {
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .msg-row.anon .anon-name {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: #5a7a9a;
+    margin-left: 4px;
+    text-transform: lowercase;
+  }
+  .msg-row.anon .bubble {
+    background: #0d1418;
+    color: #b8c8d4;
+    border: 1px solid #24343d;
+    border-bottom-left-radius: 3px;
+  }
+  .system-row {
+    text-align: center;
+    color: #4a4a4a;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    font-style: italic;
+    padding: 4px 0;
+    animation: msg-in 0.4s ease;
+  }
   .chat-actions {
     padding: 14px 16px;
     border-top: 1px solid #1a1a1a;
@@ -663,6 +691,7 @@
         <button id="btn-hello">здравствуйте</button>
         <button id="btn-sad" class="hidden">мне грустно</button>
         <button id="btn-happy" class="hidden">мне хорошо</button>
+        <button id="btn-reply" class="hidden">ответить</button>
       </div>
     </div>
   </div>
@@ -802,6 +831,7 @@
   const btnHello = document.getElementById('btn-hello');
   const btnSad = document.getElementById('btn-sad');
   const btnHappy = document.getElementById('btn-happy');
+  const btnReply = document.getElementById('btn-reply');
 
   document.getElementById('support-btn').addEventListener('click', () => {
     supportModal.classList.add('active');
@@ -888,6 +918,29 @@
     chatLog.scrollTop = chatLog.scrollHeight;
   }
 
+  function addAnonMessage(text) {
+    const row = document.createElement('div');
+    row.className = 'msg-row anon';
+    const name = document.createElement('div');
+    name.className = 'anon-name';
+    name.textContent = 'анонимный пользователь';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+    row.appendChild(name);
+    row.appendChild(bubble);
+    chatLog.appendChild(row);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  function addSystem(text) {
+    const row = document.createElement('div');
+    row.className = 'system-row';
+    row.textContent = text;
+    chatLog.appendChild(row);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
   function showTyping() {
     const row = document.createElement('div');
     row.className = 'msg-row bot';
@@ -920,7 +973,8 @@
       addMessage(text, 'bot', angry);
     }, delay || 800);
   }
-
+!
+ 
   btnHello.addEventListener('click', () => {
     addMessage('здравствуйте', 'user', false);
     btnHello.disabled = true;
@@ -945,16 +999,84 @@
     });
   });
 
+  const ANON_STEPS = [
+    {
+      user: 'привет, ты кто?',
+      anon: 'я скучаю, вновь ты думаешь обо мне',
+      reply: '…'
+    },
+    {
+      user: 'мне до сих пор бывает обидно из-за тебя..',
+      anon: 'прости',
+      reply: null
+    }
+  ];
+
+  const ANON_DIALOG = [
+    {
+      user: 'привет, ты кто?',
+      anon: 'я скучаю, вновь ты думаешь обо мне'
+    },
+    {
+      user: '…',
+      anon: 'мне до сих пор бывает обидно из-за тебя..'
+    },
+    {
+      user: 'прости',
+      anon: 'пожалуйста, хватит сюда возвращаться'
+    }
+  ];
+
+  let anonIndex = 0;
+
   btnHappy.addEventListener('click', () => {
     addMessage('мне хорошо', 'user', false);
     btnHappy.disabled = true;
     btnSad.disabled = true;
+
     const angry = pickRandom(ANGRY_POOL, 10);
     angry.forEach((r, i) => {
       setTimeout(() => {
         botSay(r, true, 400);
       }, i * 900);
     });
+
+    const totalAngryTime = 10 * 900 + 800;
+
+    setTimeout(() => {
+      addAnonMessage('привет');
+      btnReply.classList.remove('hidden');
+    }, totalAngryTime + 2500);
+  });
+
+  btnReply.addEventListener('click', () => {
+    if (anonIndex >= ANON_DIALOG.length) return;
+
+    const step = ANON_DIALOG[anonIndex];
+    btnReply.disabled = true;
+
+    addMessage(step.user, 'user', false);
+
+    setTimeout(() => {
+      addAnonMessage(step.anon);
+      anonIndex++;
+
+      if (anonIndex < ANON_DIALOG.length) {
+        setTimeout(() => {
+          btnReply.disabled = false;
+        }, 800);
+      } else {
+        setTimeout(() => {
+          addSystem('анонимный пользователь покинул чат');
+          btnReply.classList.add('hidden');
+          btnReply.disabled = false;
+
+          setTimeout(() => {
+            botSay('бывает, крепись..', false, 1500);
+          }, 1800);
+        }, 1200);
+      }
+    }, 1000);
   });
 </script>
 </body>
