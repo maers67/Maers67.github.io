@@ -865,7 +865,15 @@
     'уходи. просто уходи.'
   ];
 
-  let helloDone = false;
+  function pickRandom(arr, n) {
+    const copy = arr.slice();
+    const out = [];
+    for (let i = 0; i < n && copy.length; i++) {
+      const idx = Math.floor(Math.random() * copy.length);
+      out.push(copy.splice(idx, 1)[0]);
+    }
+    return out;
+  }
 
   function addMessage(text, side, angry) {
     const row = document.createElement('div');
@@ -873,17 +881,3 @@
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
     bubble.textContent = text;
-    row.appendChild(bubble);
-    chatLog.appendChild(row);
-    chatLog.scrollTop = chatLog.scrollHeight;
-  }
-
-  function showTyping(side) {
-    const row = document.createElement('div');
-    row.className = 'msg-row ' + side;
-    row.id = 'typing-row';
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    const t = document.createElement('span');
-    t.className = 'typing';
-    t.innerHTML =
