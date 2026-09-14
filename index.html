@@ -146,6 +146,7 @@
     padding: 24px;
     opacity: 0;
     transition: opacity 0.4s ease;
+    overflow: hidden;
   }
   .modal.active { display: flex; opacity: 1; }
   .modal-inner {
@@ -157,6 +158,7 @@
     background: #080808;
     border: 1px solid #1c1c1c;
     position: relative;
+    z-index: 2;
   }
   .modal-inner::-webkit-scrollbar { width: 6px; }
   .modal-inner::-webkit-scrollbar-track { background: #0a0a0a; }
@@ -201,6 +203,7 @@
     cursor: pointer;
     font-family: inherit;
     transition: color 0.3s;
+    z-index: 3;
   }
   .close:hover { color: #8b0000; }
   #bio .modal-inner { text-align: center; }
@@ -303,6 +306,96 @@
     60% { opacity: 0.6; }
     62% { opacity: 1; }
   }
+
+  /* ===== Пентаграмма на фоне bio ===== */
+  .pentagram-bg {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.55;
+    animation: penta-spin 60s linear infinite;
+  }
+  .pentagram-bg svg {
+    width: min(85vw, 85vh);
+    height: min(85vw, 85vh);
+    filter: drop-shadow(0 0 14px rgba(139,0,0,0.6));
+  }
+  @keyframes penta-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* ===== Экран загрузки ===== */
+  #loading {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  #loading.active { display: flex; }
+  .loading-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    width: min(90vw, 420px);
+  }
+  .loading-percent {
+    font-size: clamp(2rem, 8vw, 3.5rem);
+    letter-spacing: 0.3em;
+    color: #8b0000;
+    text-shadow: 0 0 20px rgba(139,0,0,0.7);
+    font-weight: 700;
+  }
+  .loading-bar {
+    width: 100%;
+    height: 2px;
+    background: #1a1a1a;
+    overflow: hidden;
+  }
+  .loading-fill {
+    width: 0%;
+    height: 100%;
+    background: #8b0000;
+    box-shadow: 0 0 12px rgba(139,0,0,0.9);
+    transition: width 0.9s linear;
+  }
+  .loading-text {
+    font-size: 0.8rem;
+    letter-spacing: 0.5em;
+    color: #444;
+    text-transform: uppercase;
+  }
+
+  /* ===== Финальная надпись ===== */
+  #done-msg {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 201;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  #done-msg.active { display: flex; }
+  #done-msg .msg {
+    color: #8b0000;
+    font-size: clamp(1.2rem, 5vw, 2rem);
+    letter-spacing: 0.25em;
+    text-align: center;
+    text-shadow: 0 0 24px rgba(139,0,0,0.8);
+    animation: flicker 3s infinite;
+  }
+
   @media (max-width: 600px) {
     .modal-inner { padding: 32px 20px; }
     .menu { gap: 20px; }
@@ -313,6 +406,7 @@
   <div id="page1">
     <div class="maers-title" id="enter">maers</div>
   </div>
+
   <div id="page2">
     <div id="rain"></div>
     <div class="menu">
@@ -321,6 +415,7 @@
       <button class="btn" id="open-bio">bio</button>
     </div>
   </div>
+
   <div class="modal" id="death">
     <div class="modal-inner">
       <button class="close" data-close="death">×</button>
@@ -334,7 +429,17 @@
       <div class="pass-hint">pass:1234</div>
     </div>
   </div>
+
   <div class="modal" id="bio">
+    <div class="pentagram-bg">
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="100" r="92" fill="none" stroke="#6b0000" stroke-width="1.2"/>
+        <circle cx="100" cy="100" r="80" fill="none" stroke="#3a0000" stroke-width="0.6"/>
+        <polygon points="100,18 148,166 26,74 174,74 52,166"
+                 fill="none" stroke="#8b0000" stroke-width="1.4"
+                 stroke-linejoin="round"/>
+      </svg>
+    </div>
     <div class="modal-inner">
       <button class="close" data-close="bio">×</button>
       <h2>bio</h2>
@@ -351,13 +456,28 @@
       </div>
     </div>
   </div>
+
+  <div id="loading">
+    <div class="loading-inner">
+      <div class="loading-percent" id="load-pct">0%</div>
+      <div class="loading-bar"><div class="loading-fill" id="load-fill"></div></div>
+      <div class="loading-text">loading</div>
+    </div>
+  </div>
+
+  <div id="done-msg">
+    <div class="msg">krasava dayn, dozhdalsya haha</div>
+  </div>
+
   <div id="void">
     <div class="broken">ты сломал сайт</div>
   </div>
+
 <script>
   const enter = document.getElementById('enter');
   const page1 = document.getElementById('page1');
   const page2 = document.getElementById('page2');
+
   enter.addEventListener('click', () => {
     enter.classList.add('fade-out');
     setTimeout(() => {
@@ -366,9 +486,11 @@
       startRain();
     }, 600);
   });
+
   const glyphs = ['死','血','暗','恐','冥','罪','亡','獄','髑','喪','屠','蝕','鬼','骸','棺','黙','惨','呪','瘡','亡霊','窒息','断頭'];
   const rain = document.getElementById('rain');
   let rainStarted = false;
+
   function startRain() {
     if (rainStarted) return;
     rainStarted = true;
@@ -384,9 +506,11 @@
       rain.appendChild(g);
     }
   }
+
   document.getElementById('open-death').addEventListener('click', () => {
     document.getElementById('death').classList.add('active');
   });
+
   document.getElementById('open-bio').addEventListener('click', () => {
     const bio = document.getElementById('bio');
     bio.classList.add('active');
@@ -394,19 +518,23 @@
     document.getElementById('bio-pass').value = '';
     document.getElementById('bio-err').textContent = '';
   });
+
   document.querySelectorAll('[data-close]').forEach(btn => {
     btn.addEventListener('click', () => {
       document.getElementById(btn.dataset.close).classList.remove('active');
     });
   });
+
   document.querySelectorAll('.modal').forEach(m => {
     m.addEventListener('click', e => {
       if (e.target === m) m.classList.remove('active');
     });
   });
+
   const bioPass = document.getElementById('bio-pass');
   const bioErr = document.getElementById('bio-err');
   const bioModal = document.getElementById('bio');
+
   bioPass.addEventListener('input', () => {
     bioErr.textContent = '';
     if (bioPass.value === '1234') {
@@ -415,6 +543,7 @@
       }, 150);
     }
   });
+
   bioPass.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       if (bioPass.value === '1234') {
@@ -425,21 +554,39 @@
       }
     }
   });
+
   bioPass.addEventListener('blur', () => {
     if (bioPass.value && bioPass.value !== '1234') {
       bioErr.textContent = 'denied';
       bioPass.value = '';
     }
   });
+
   document.getElementById('next-btn').addEventListener('click', () => {
     document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-    document.body.classList.add('crumble');
-    setTimeout(() => {
-      document.querySelectorAll('body > *').forEach(el => {
-        if (el.id !== 'void') el.style.display = 'none';
-      });
-      document.getElementById('void').classList.add('active');
-    }, 1400);
+
+    const loading = document.getElementById('loading');
+    const pct = document.getElementById('load-pct');
+    const fill = document.getElementById('load-fill');
+    loading.classList.add('active');
+
+    let n = 0;
+    pct.textContent = '0%';
+    fill.style.width = '0%';
+
+    const interval = setInterval(() => {
+      n++;
+      pct.textContent = n + '%';
+      fill.style.width = n + '%';
+
+      if (n >= 100) {
+        clearInterval(interval);
+        setTimeout(() => {
+          loading.classList.remove('active');
+          document.getElementById('done-msg').classList.add('active');
+        }, 700);
+      }
+    }, 1000);
   });
 </script>
 </body>
