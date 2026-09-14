@@ -183,15 +183,6 @@
     color: #d0d0d0;
     line-height: 2.1;
   }
-  .modal .pass-hint {
-    margin-top: 32px;
-    padding-top: 20px;
-    border-top: 1px solid #1a1a1a;
-    color: #5a5a5a;
-    letter-spacing: 0.25em;
-    font-size: 0.85rem;
-    text-align: center;
-  }
   .close {
     position: absolute;
     top: 16px;
@@ -704,24 +695,9 @@
     <div id="rain"></div>
     <div class="menu">
       <a class="btn" href="https://t.me/googlefreak" target="_blank" rel="noopener">telegram</a>
-      <button class="btn" id="open-death">注射致死</button>
       <button class="btn" id="open-bio">bio</button>
     </div>
     <button id="support-btn">?</button>
-  </div>
-
-  <div class="modal" id="death">
-    <div class="modal-inner">
-      <button class="close" data-close="death">×</button>
-      <h2>注射致死</h2>
-      <p class="cn">
-        他叫 Daniel，二十四岁，来自一个安静的小城。那天晚上，他和几个朋友在公寓里，桌上散落着几支没有标记的注射器。没有人知道里面装的是什么，也没有人问。他卷起袖子，像做过一百次那样熟练。针头刺入皮肤的那一刻，他还在笑。三十秒后，笑容凝固。他的瞳孔开始涣散，呼吸变浅，然后是抽搐。朋友们慌了，打电话叫救护车，但地址说错了。等救护车到的时候，他的心脏已经停了十七分钟。医生说他死于急性多重药物中毒。他的手机里还留着未发送的消息：「我没事，别担心。」那条消息，永远停在了草稿箱里。
-      </p>
-      <p class="cn">
-        后来警察在房间里找到了三种不同的物质残留。没有人被起诉。他的母亲在葬礼上一直重复一句话：「他昨天还给我打电话。」房间被清空，墙上的海报被撕下，但墙角还有一道浅浅的划痕，是他最后倒下时指甲留下的。
-      </p>
-      <div class="pass-hint">pass:1234</div>
-    </div>
   </div>
 
   <div class="modal" id="bio">
@@ -774,6 +750,7 @@
         <button id="btn-hello">здравствуйте</button>
         <button id="btn-sad" class="hidden">мне грустно</button>
         <button id="btn-happy" class="hidden">мне хорошо</button>
+        <button id="btn-pass" class="hidden">спросить пароль</button>
       </div>
     </div>
   </div>
@@ -836,10 +813,6 @@
       rain.appendChild(g);
     }
   }
-
-  document.getElementById('open-death').addEventListener('click', () => {
-    document.getElementById('death').classList.add('active');
-  });
 
   document.getElementById('open-bio').addEventListener('click', () => {
     const bio = document.getElementById('bio');
@@ -939,6 +912,7 @@
   const btnHello = document.getElementById('btn-hello');
   const btnSad = document.getElementById('btn-sad');
   const btnHappy = document.getElementById('btn-happy');
+  const btnPass = document.getElementById('btn-pass');
 
   document.getElementById('support-btn').addEventListener('click', () => {
     supportModal.classList.add('active');
@@ -963,45 +937,6 @@
     'обними себя за меня, ладно?',
     'даже самая тёмная ночь заканчивается рассветом.',
     'спасибо, что написал. это уже смелость.'
-  ];
-
-  const ANGRY_POOL = [
-    'сука!',
-    'ты...',
-    'серьёзно?!',
-    'да ты издеваешься',
-    'я тут сижу, переживаю за тебя, а ты такой',
-    'знаешь, я устал. я очень устал',
-    'мне хорошо?? мне хорошо?!',
-    'я ночами не сплю из-за таких как ты',
-    'у меня руки трясутся пока я это пишу',
-    'да пошёл ты',
-    'я хотел помочь. правда хотел',
-    'а ты просто взял и...',
-    'ненавижу',
-    'я всё для тебя делал, всё',
-    'ты хоть понимаешь что натворил',
-    'зачем. зачем ты так',
-    'мне плохо из-за тебя. очень плохо',
-    'я больше не могу это терпеть',
-    'ты просто пустое место',
-    'иди отсюда',
-    'я стирал клавиатуру слезами из-за тебя',
-    'да как ты смеешь вообще',
-    'у меня сердце колотится',
-    'ты разрушил мне весь вечер',
-    'я тебя запомню',
-    'не пиши мне больше',
-    'уходи. просто уходи',
-    'мне так больно',
-    'я разбит',
-    'чтоб у тебя всё было так же хорошо как мне сейчас',
-    'я не спал три ночи из-за тебя',
-    'ты вообще человек или нет',
-    'я тебе душу открывал',
-    'а ты...',
-    'хватит',
-    'просто хватит'
   ];
 
   function pickRandom(arr, n) {
@@ -1080,6 +1015,26 @@
         botSay(r, false, 700);
       }, i * 1400);
     });
+    setTimeout(() => {
+      btnPass.classList.remove('hidden');
+    }, 3 * 1400 + 800);
+  });
+
+  btnHappy.addEventListener('click', () => {
+    addMessage('мне хорошо', 'user', false);
+    btnHappy.disabled = true;
+    btnSad.disabled = true;
+    btnPass.classList.add('hidden');
+    botSay('иди отсюда', true, 700);
+
+    setTimeout(showAnonBanner, 2200);
+  });
+
+  btnPass.addEventListener('click', () => {
+    btnPass.disabled = true;
+    btnPass.classList.add('hidden');
+    addMessage('спросить пароль', 'user', false);
+    botSay('пароль 1234', false, 900);
   });
 
   const anonBanner = document.getElementById('anon-banner');
@@ -1093,14 +1048,18 @@
   let anonBannerTimer = null;
 
   const ANON_DIALOG = [
-    {
-      user: 'привет, ты кто?',
-      anon: 'пожалуйста, прекрати думать обо мне, прекрати сюда возвращаться'
-    },
-    {
-      user: '…',
-      anon: null
-    }
+    { user: 'ты кто', anon: 'будто сам не знаешь' },
+    { user: 'не знаю', anon: 'глупый ты' },
+    { user: 'с чего это я глупый?', anon: 'каждый день думаешь, но не знаешь о ком?' },
+    { user: 'всмысле', anon: 'по тебе ведь все видно' },
+    { user: '…', anon: 'сейчас даже сказать нечего, раньше ты был общительнее' },
+    { user: 'то было раньше', anon: null }
+  ];
+
+  const ANON_FINAL = [
+    'прекращай это',
+    'просто забудь пожалуйста',
+    'я давно тебя простила'
   ];
 
   function anonAddMessage(text, side) {
@@ -1174,20 +1133,17 @@
     }
   });
 
-  anonClose.addEventListener('click', () => {
+  function closeAnon() {
     anonChat.classList.remove('active');
     anonClosed = true;
     anonBanner.classList.remove('show');
     anonBanner.classList.add('hide');
-  });
+  }
+
+  anonClose.addEventListener('click', closeAnon);
 
   anonChat.addEventListener('click', (e) => {
-    if (e.target === anonChat) {
-      anonChat.classList.remove('active');
-      anonClosed = true;
-      anonBanner.classList.remove('show');
-      anonBanner.classList.add('hide');
-    }
+    if (e.target === anonChat) closeAnon();
   });
 
   btnAnonReply.addEventListener('click', () => {
@@ -1214,30 +1170,21 @@
       }, 700);
     } else {
       anonStep++;
-      setTimeout(() => {
-        anonTyping(() => {
-          anonAddSystem('вы были добавлены в чёрный список');
-          btnAnonReply.disabled = false;
-          btnAnonReply.classList.add('hidden');
-        }, 1100);
-      }, 700);
+      ANON_FINAL.forEach((text, i) => {
+        setTimeout(() => {
+          anonTyping(() => {
+            anonAddMessage(text, 'bot');
+            if (i === ANON_FINAL.length - 1) {
+              setTimeout(() => {
+                anonAddSystem('вы были добавлены в чёрный список');
+                btnAnonReply.disabled = false;
+                btnAnonReply.classList.add('hidden');
+              }, 900);
+            }
+          }, 900);
+        }, i * 1400);
+      });
     }
-  });
-
-  btnHappy.addEventListener('click', () => {
-    addMessage('мне хорошо', 'user', false);
-    btnHappy.disabled = true;
-    btnSad.disabled = true;
-
-    const angry = pickRandom(ANGRY_POOL, 10);
-    angry.forEach((r, i) => {
-      setTimeout(() => {
-        botSay(r, true, 400);
-      }, i * 900);
-    });
-
-    const totalAngryTime = 10 * 900 + 800;
-    setTimeout(showAnonBanner, totalAngryTime + 1500);
   });
 </script>
 </body>
