@@ -306,26 +306,6 @@
     60% { opacity: 0.6; }
     62% { opacity: 1; }
   }
-  .pentagram-bg {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3;
-    pointer-events: none;
-    opacity: 0.35;
-    animation: penta-spin 60s linear infinite;
-  }
-  .pentagram-bg svg {
-    width: min(90vw, 90vh);
-    height: min(90vw, 90vh);
-    filter: drop-shadow(0 0 18px rgba(139,0,0,0.9));
-  }
-  @keyframes penta-spin {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-  }
   #loading {
     position: fixed;
     inset: 0;
@@ -343,6 +323,14 @@
     align-items: center;
     gap: 24px;
     width: min(90vw, 420px);
+  }
+  .loading-stage {
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    color: #8b0000;
+    text-align: center;
+    min-height: 1.2em;
+    opacity: 0.9;
   }
   .loading-percent {
     font-size: clamp(2rem, 8vw, 3.5rem);
@@ -626,15 +614,6 @@
   </div>
 
   <div class="modal" id="bio">
-    <div class="pentagram-bg">
-      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="100" cy="100" r="92" fill="none" stroke="#6b0000" stroke-width="1.2"/>
-        <circle cx="100" cy="100" r="80" fill="none" stroke="#3a0000" stroke-width="0.6"/>
-        <polygon points="100,18 148,166 26,74 174,74 52,166"
-                 fill="none" stroke="#8b0000" stroke-width="1.4"
-                 stroke-linejoin="round"/>
-      </svg>
-    </div>
     <div class="modal-inner">
       <button class="close" data-close="bio">×</button>
       <h2>bio</h2>
@@ -654,6 +633,7 @@
 
   <div id="loading">
     <div class="loading-inner">
+      <div class="loading-stage" id="load-stage">выгружаем архивы психиатрической лечебницы</div>
       <div class="loading-percent" id="load-pct">0%</div>
       <div class="loading-bar"><div class="loading-fill" id="load-fill"></div></div>
       <div class="loading-text">loading</div>
@@ -781,16 +761,31 @@
     const loading = document.getElementById('loading');
     const pct = document.getElementById('load-pct');
     const fill = document.getElementById('load-fill');
+    const stage = document.getElementById('load-stage');
     loading.classList.add('active');
+
+    const stages = [
+      { min: 0,  max: 9,   text: 'выгружаем архивы психиатрической лечебницы' },
+      { min: 10, max: 19,  text: 'корректируем базу данных' },
+      { min: 20, max: 29,  text: 'выгружаем в облако' },
+      { min: 30, max: 39,  text: 'сохраняем ваш ip' },
+      { min: 40, max: 49,  text: 'почти готово' },
+      { min: 50, max: 59,  text: 'последние штрихи' },
+      { min: 60, max: 100, text: 'ожидайте' }
+    ];
 
     let n = 0;
     pct.textContent = '0%';
     fill.style.width = '0%';
+    stage.textContent = stages[0].text;
 
     const interval = setInterval(() => {
       n++;
       pct.textContent = n + '%';
       fill.style.width = n + '%';
+
+      const cur = stages.find(s => n >= s.min && n <= s.max);
+      if (cur) stage.textContent = cur.text;
 
       if (n >= 100) {
         clearInterval(interval);
@@ -834,36 +829,42 @@
   ];
 
   const ANGRY_POOL = [
-    'ты серьёзно?!',
-    'я тут ночами не сплю ради тебя!',
-    'а мне каково, по-твоему?!',
-    'мне хорошо?? да ты издеваешься!',
-    'я тебе душу открываю, а ты...',
-    'знаешь что, иди к чёрту!',
-    'больше никогда не пиши мне!',
-    'я тебя ненавижу!!!',
-    'ты думаешь это смешно?!',
-    'у меня из-за тебя руки трясутся!',
-    'зачем ты вообще сюда зашёл?!',
-    'я стирал эту клавиатуру слезами!',
-    'а ты просто мне хорошо?!',
-    'да чтоб ты подавился своим хорошо!',
-    'я всё для тебя, а ты вот так?!',
-    'ты хуже всех, кого я знал!',
-    'мне так больно из-за тебя!',
-    'ты разрушил мне вечер!',
-    'я больше не выдержу этого!',
-    'ненавижу. просто ненавижу.',
-    'ты вообще человек?!',
-    'я не спал три ночи из-за таких как ты!',
-    'да как ты смеешь!',
-    'я тебя запомню. навсегда.',
-    'ты просто пустое место!',
-    'я хотел помочь, а теперь жалею!',
-    'чтоб у тебя всё было так же хорошо, как мне сейчас!',
-    'я разбит. из-за тебя.',
-    'не пиши мне больше. никогда.',
-    'уходи. просто уходи.'
+    'сука!',
+    'ты...',
+    'серьёзно?!',
+    'да ты издеваешься',
+    'я тут сижу, переживаю за тебя, а ты такой',
+    'знаешь, я устал. я очень устал',
+    'мне хорошо?? мне хорошо?!',
+    'я ночами не сплю из-за таких как ты',
+    'у меня руки трясутся пока я это пишу',
+    'да пошёл ты',
+    'я хотел помочь. правда хотел',
+    'а ты просто взял и...',
+    'ненавижу',
+    'я всё для тебя делал, всё',
+    'ты хоть понимаешь что натворил',
+    'зачем. зачем ты так',
+    'мне плохо из-за тебя. очень плохо',
+    'я больше не могу это терпеть',
+    'ты просто пустое место',
+    'иди отсюда',
+    'я стирал клавиатуру слезами из-за тебя',
+    'да как ты смеешь вообще',
+    'у меня сердце колотится',
+    'ты разрушил мне весь вечер',
+    'я тебя запомню',
+    'не пиши мне больше',
+    'уходи. просто уходи',
+    'мне так больно',
+    'я разбит',
+    'чтоб у тебя всё было так же хорошо как мне сейчас',
+    'я не спал три ночи из-за тебя',
+    'ты вообще человек или нет',
+    'я тебе душу открывал',
+    'а ты...',
+    'хватит',
+    'просто хватит'
   ];
 
   function pickRandom(arr, n) {
@@ -951,8 +952,8 @@
     const angry = pickRandom(ANGRY_POOL, 10);
     angry.forEach((r, i) => {
       setTimeout(() => {
-        botSay(r, true, 500);
-      }, i * 1100);
+        botSay(r, true, 400);
+      }, i * 900);
     });
   });
 </script>
