@@ -16,26 +16,36 @@
   #page1 {
     position: fixed;
     inset: 0;
-    background-image: url('bg.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background: #000;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: opacity 0.8s ease, transform 0.8s ease;
     z-index: 10;
+    overflow: hidden;
   }
   #page1::before {
     content: '';
     position: absolute;
+    inset: -50%;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(255,255,255,0.04) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(255,255,255,0.03) 0%, transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(255,255,255,0.02) 0%, transparent 60%);
+    animation: drift 24s ease-in-out infinite alternate;
+  }
+  @keyframes drift {
+    0%   { transform: translate(0,0) rotate(0deg); }
+    100% { transform: translate(2%, -2%) rotate(3deg); }
+  }
+  #page1::after {
+    content: '';
+    position: absolute;
     inset: 0;
-    background: radial-gradient(
-      ellipse at center,
-      rgba(0,0,0,0.55) 0%,
-      rgba(0,0,0,0.85) 60%,
-      rgba(0,0,0,0.97) 100%
-    );
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px);
+    pointer-events: none;
+    mix-blend-mode: overlay;
   }
   .maers-title {
     position: relative;
@@ -44,10 +54,10 @@
     font-weight: 700;
     letter-spacing: 0.4em;
     text-transform: lowercase;
-    color: #ececec;
+    color: #dcdcdc;
     cursor: pointer;
     user-select: none;
-    text-shadow: 0 0 30px rgba(0,0,0,1), 0 0 60px rgba(0,0,0,0.8);
+    text-shadow: 0 0 30px rgba(0,0,0,1), 0 0 60px rgba(0,0,0,0.8), 0 0 4px rgba(255,255,255,0.15);
     transition: letter-spacing 0.4s ease, opacity 0.4s ease;
     padding-left: 0.4em;
   }
@@ -171,6 +181,15 @@
     color: #d0d0d0;
     line-height: 2.1;
   }
+  .modal .pass-hint {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid #1a1a1a;
+    color: #5a5a5a;
+    letter-spacing: 0.25em;
+    font-size: 0.85rem;
+    text-align: center;
+  }
   .close {
     position: absolute;
     top: 16px;
@@ -210,6 +229,47 @@
     color: #fff;
     box-shadow: 0 0 40px rgba(139,0,0,0.6);
   }
+  .lock-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    padding: 20px 0;
+  }
+  .lock-screen .label {
+    font-size: clamp(1rem, 3.5vw, 1.3rem);
+    letter-spacing: 0.4em;
+    color: #8b0000;
+    text-transform: lowercase;
+  }
+  .lock-screen input {
+    width: 100%;
+    max-width: 260px;
+    padding: 14px 18px;
+    background: #0c0c0c;
+    border: 1px solid #232323;
+    color: #e0e0e0;
+    font-family: inherit;
+    font-size: 1rem;
+    letter-spacing: 0.4em;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .lock-screen input:focus {
+    border-color: #6b0000;
+    box-shadow: 0 0 20px rgba(120,0,0,0.4);
+  }
+  .lock-screen .err {
+    color: #6b0000;
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    min-height: 1em;
+  }
+  #bio .locked { display: flex; }
+  #bio .unlocked { display: none; }
+  #bio.unlocked-state .locked { display: none; }
+  #bio.unlocked-state .unlocked { display: block; }
   .crumble { animation: crumble 1.6s forwards; }
   @keyframes crumble {
     0%   { filter: blur(0); opacity: 1; transform: scale(1); }
@@ -224,13 +284,25 @@
     display: none;
     align-items: center;
     justify-content: center;
-    color: #2a2a2a;
-    font-size: clamp(0.8rem, 2.5vw, 1rem);
-    letter-spacing: 0.5em;
-    text-align: center;
     padding: 20px;
   }
   #void.active { display: flex; }
+  #void .broken {
+    color: #6b0000;
+    font-size: clamp(1.1rem, 4vw, 1.6rem);
+    letter-spacing: 0.4em;
+    text-transform: lowercase;
+    text-shadow: 0 0 20px rgba(120,0,0,0.6);
+    animation: flicker 3s infinite;
+    text-align: center;
+  }
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    45% { opacity: 0.4; }
+    47% { opacity: 1; }
+    60% { opacity: 0.6; }
+    62% { opacity: 1; }
+  }
   @media (max-width: 600px) {
     .modal-inner { padding: 32px 20px; }
     .menu { gap: 20px; }
@@ -259,17 +331,29 @@
       <p class="cn">
         后来警察在房间里找到了三种不同的物质残留。没有人被起诉。他的母亲在葬礼上一直重复一句话：「他昨天还给我打电话。」房间被清空，墙上的海报被撕下，但墙角还有一道浅浅的划痕，是他最后倒下时指甲留下的。
       </p>
+      <div class="pass-hint">pass:1234</div>
     </div>
   </div>
   <div class="modal" id="bio">
     <div class="modal-inner">
       <button class="close" data-close="bio">×</button>
       <h2>bio</h2>
-      <div class="tagline">maers — this generation</div>
-      <button id="next-btn">далее</button>
+      <div class="locked">
+        <div class="lock-screen">
+          <div class="label">pass</div>
+          <input type="password" id="bio-pass" maxlength="16" autocomplete="off" inputmode="numeric">
+          <div class="err" id="bio-err"></div>
+        </div>
+      </div>
+      <div class="unlocked">
+        <div class="tagline">maers — this generation</div>
+        <button id="next-btn">далее</button>
+      </div>
     </div>
   </div>
-  <div id="void">обнови страницу</div>
+  <div id="void">
+    <div class="broken">ты сломал сайт</div>
+  </div>
 <script>
   const enter = document.getElementById('enter');
   const page1 = document.getElementById('page1');
@@ -304,7 +388,11 @@
     document.getElementById('death').classList.add('active');
   });
   document.getElementById('open-bio').addEventListener('click', () => {
-    document.getElementById('bio').classList.add('active');
+    const bio = document.getElementById('bio');
+    bio.classList.add('active');
+    bio.classList.remove('unlocked-state');
+    document.getElementById('bio-pass').value = '';
+    document.getElementById('bio-err').textContent = '';
   });
   document.querySelectorAll('[data-close]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -315,6 +403,33 @@
     m.addEventListener('click', e => {
       if (e.target === m) m.classList.remove('active');
     });
+  });
+  const bioPass = document.getElementById('bio-pass');
+  const bioErr = document.getElementById('bio-err');
+  const bioModal = document.getElementById('bio');
+  bioPass.addEventListener('input', () => {
+    bioErr.textContent = '';
+    if (bioPass.value === '1234') {
+      setTimeout(() => {
+        bioModal.classList.add('unlocked-state');
+      }, 150);
+    }
+  });
+  bioPass.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      if (bioPass.value === '1234') {
+        bioModal.classList.add('unlocked-state');
+      } else {
+        bioErr.textContent = 'denied';
+        bioPass.value = '';
+      }
+    }
+  });
+  bioPass.addEventListener('blur', () => {
+    if (bioPass.value && bioPass.value !== '1234') {
+      bioErr.textContent = 'denied';
+      bioPass.value = '';
+    }
   });
   document.getElementById('next-btn').addEventListener('click', () => {
     document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
